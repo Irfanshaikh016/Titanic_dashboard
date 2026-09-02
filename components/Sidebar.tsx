@@ -1,76 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
 
-const NAV_ITEMS = [
-  { id: "overview", label: "Overview", icon: "📊" },
-  { id: "charts", label: "Charts", icon: "📈" },
-  { id: "insights", label: "Insights", icon: "💡" },
-  { id: "table", label: "Passenger Data", icon: "🧾" },
-];
+type Item = { href: string; label: string; icon?: React.ReactNode };
 
-export default function Sidebar({
-  active,
-  onNavigate,
-}: {
-  active: string;
-  onNavigate: (id: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
+export default function Sidebar() {
+  const pathname = usePathname() || "/";
+
+  const items: Item[] = [
+    { href: "/", label: "Overview", icon: <span className="text-xl">📊</span> },
+    { href: "/charts", label: "Charts", icon: <span className="text-xl">📈</span> },
+    { href: "/insights", label: "Insights", icon: <span className="text-xl">💡</span> },
+    { href: "/passenger-data", label: "Passenger Data", icon: <span className="text-xl">📄</span> },
+  ];
+
+  // active if pathname matches or is a nested route under href
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <>
-      {/* Mobile top bar */}
-      <div className="lg:hidden flex items-center justify-between bg-[#0b1220] px-4 py-3 sticky top-0 z-30">
-        <div className="flex items-center gap-2 text-white font-bold">
-          <span className="text-xl">🚢</span>
-          <span>Titanic Analytics</span>
-        </div>
-        <button
-          onClick={() => setOpen((o) => !o)}
-          className="text-white p-2 rounded-md hover:bg-white/10"
-          aria-label="Toggle navigation"
-        >
-          {open ? "✕" : "☰"}
-        </button>
-      </div>
+    <aside className="w-64 bg-[#071226] text-white p-6 rounded-md">
+      <header className="mb-6 flex items-center gap-3">
+        <span className="text-2xl">🚢</span>
+        <h1 className="font-semibold text-lg">Titanic Analytics</h1>
+      </header>
 
-      <aside
-        className={`bg-[#0b1220] text-gray-300 w-full lg:w-64 lg:min-h-screen lg:sticky lg:top-0 flex-shrink-0 ${
-          open ? "block" : "hidden"
-        } lg:block`}
-      >
-        <div className="hidden lg:flex items-center gap-2 px-6 py-6 text-white font-bold text-lg">
-          <span className="text-2xl">🚢</span>
-          <span>Titanic Analytics</span>
-        </div>
-
-        <nav className="px-3 py-4 lg:py-2 space-y-1">
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                onNavigate(item.id);
-                setOpen(false);
-              }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                active === item.id
-                  ? "bg-brand-600 text-white"
-                  : "text-gray-300 hover:bg-white/5 hover:text-white"
-              }`}
+      <nav className="space-y-3">
+        {items.map((it) => {
+          const active = isActive(it.href);
+          return (
+            <Link
+              key={it.href}
+              href={it.href}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-150
+                ${active
+                  ? "bg-blue-600 text-white ring-2 ring-white/30 shadow-sm"
+                  : "text-slate-300 hover:bg-white/5"}`}
             >
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
+              <span>{it.icon}</span>
+              <span className="flex-1">{it.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
-        <div className="hidden lg:block px-6 py-4 mt-auto text-xs text-gray-500 border-t border-white/5">
-          Data: train-selected-columns.csv
-          <br />
-          891 passengers · cleaned pipeline
-        </div>
-      </aside>
-    </>
+      <div className="mt-6 text-slate-400 text-sm">
+        Data: train-selected-columns.csv
+        <br />
+        891 passengers · cleaned pipeline
+      </div>
+    </aside>
   );
 }
