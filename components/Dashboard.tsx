@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import type { Passenger, FilterState } from "@/lib/types";
 import { applyFilters, computeKPIs, getDataBounds, DEFAULT_FILTERS } from "@/lib/data";
 
-import Sidebar from "@/components/Sidebar";
 import KPICards from "@/components/KPICards";
 import Filters from "@/components/Filters";
 import SurvivalChart from "@/components/SurvivalChart";
@@ -41,10 +40,8 @@ export default function Dashboard({ initialData }: { initialData: Passenger[] })
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[#f6f7fb]">
-      <Sidebar active={active} onNavigate={setActive} />
-
-      <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="min-h-screen bg-[#f6f7fb]">
+      <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <header>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Titanic Survival Analytics</h1>
           <p className="text-sm text-gray-500 mt-1">Interactive analysis of passenger survival patterns</p>
