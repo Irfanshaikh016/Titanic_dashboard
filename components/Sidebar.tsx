@@ -6,8 +6,17 @@ import React from "react";
 
 type Item = { href: string; label: string; icon?: React.ReactNode };
 
-export default function Sidebar() {
-  const pathname = usePathname() || "/";
+type SidebarProps = {
+  active?: string;
+  onNavigate?: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export default function Sidebar({ active: activeProp, onNavigate }: SidebarProps) {
+  // Prefer the explicitly provided `active` prop (used by some parent components).
+  // Fall back to the router pathname when `active` isn't provided.
+  const pathname = usePathname();
+  const activeFromPath = pathname || "/";
+  const active = activeProp ?? activeFromPath;
 
   const items: Item[] = [
     { href: "/", label: "Overview", icon: <span className="text-xl">📊</span> },
@@ -16,9 +25,9 @@ export default function Sidebar() {
     { href: "/passenger-data", label: "Passenger Data", icon: <span className="text-xl">📄</span> },
   ];
 
-  // active if pathname matches or is a nested route under href
+  // active if `active` matches or is a nested route under href
   const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+    href === "/" ? active === "/" : active === href || active.startsWith(href + "/");
 
   return (
     <aside className="w-64 bg-[#071226] text-white p-6 rounded-md">
@@ -29,15 +38,16 @@ export default function Sidebar() {
 
       <nav className="space-y-3">
         {items.map((it) => {
-          const active = isActive(it.href);
+          const activeItem = isActive(it.href);
           return (
             <Link
               key={it.href}
               href={it.href}
+              onClick={() => {
+                if (onNavigate) onNavigate(it.href);
+              }}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-150
-                ${active
-                  ? "bg-blue-600 text-white ring-2 ring-white/30 shadow-sm"
-                  : "text-slate-300 hover:bg-white/5"}`}
+                ${activeItem ? "bg-blue-600 text-white ring-2 ring-white/30 shadow-sm" : "text-slate-300 hover:bg-white/5"}`}
             >
               <span>{it.icon}</span>
               <span className="flex-1">{it.label}</span>
